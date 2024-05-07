@@ -80,3 +80,116 @@ WHERE NOT EXISTS (
 
 MID-COURSE TEST
 
+-- EX 1:
+SELECT DISTINCT replacement costs AS replacement_costs_distinct FROM film
+MIN (replacement_costs_distinct)
+
+-- EX 2: 
+SELECT
+    CASE
+        WHEN replacement_cost BETWEEN 9.99 AND 19.99 THEN 'low'
+        WHEN replacement_cost BETWEEN 20.00 AND 24.99 THEN 'medium'
+        WHEN replacement_cost BETWEEN 25.00 AND 29.99 THEN 'high'
+        ELSE 'other'
+    END AS cost_group,
+    COUNT(*) AS film_count
+FROM
+    films
+GROUP BY
+    cost_group
+HAVING
+    cost_group = 'low';
+
+-- EX 3:
+SELECT
+    f.title AS film_title,
+    f.length,
+    c.name AS category_name
+FROM
+    films f
+JOIN
+    film_categories fc ON f.film_id = fc.film_id
+JOIN
+    categories c ON fc.category_id = c.category_id
+WHERE
+    c.name IN ('Drama', 'Sports')
+ORDER BY
+    f.length DESC
+LIMIT 1;
+
+-- EX 4: 
+SELECT
+    c.name AS category_name,
+    COUNT(f.film_id) AS film_count
+FROM
+    categories c
+JOIN
+    film_categories fc ON c.category_id = fc.category_id
+JOIN
+    films f ON fc.film_id = f.film_id
+GROUP BY
+    c.name
+
+-- EX 5: 
+SELECT
+    a.actor_id,
+    CONCAT(a.first_name, ' ', a.last_name) AS actor_name,
+    COUNT(fa.film_id) AS film_count
+FROM
+    actors a
+JOIN
+    film_actors fa ON a.actor_id = fa.actor_id
+GROUP BY
+    a.actor_id, actor_name
+
+-- EX 6:
+SELECT
+    COUNT(a.address_id) AS address_count
+FROM
+    addresses a
+LEFT JOIN
+    customers c ON a.address_id = c.address_id
+WHERE
+    c.customer_id IS NULL;
+
+-- EX 7:
+SELECT
+    ci.city_id,
+    ci.city AS city_name,
+    SUM(p.amount) AS total_revenue
+FROM
+    city ci
+JOIN
+    address ad ON ci.city_id = ad.city_id
+JOIN
+    customer cu ON ad.address_id = cu.address_id
+JOIN
+    payment p ON cu.customer_id = p.customer_id
+GROUP BY
+    ci.city_id, city_name
+ORDER BY
+    total_revenue DESC
+
+-- EX 8:
+SELECT
+    CONCAT(ci.city, ', ', co.country) AS city_country,
+    SUM(p.amount) AS total_revenue
+FROM
+    city ci
+JOIN
+    country co ON ci.country_id = co.country_id
+JOIN
+    address ad ON ci.city_id = ad.city_id
+JOIN
+    customer cu ON ad.address_id = cu.address_id
+JOIN
+    payment p ON cu.customer_id = p.customer_id
+GROUP BY
+    ci.city_id, city_country
+ORDER BY
+    total_revenue DESC
+
+
+
+
+
